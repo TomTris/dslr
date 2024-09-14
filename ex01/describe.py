@@ -1,8 +1,9 @@
+import numpy as np
 import csv
 import sys
 
 def read_data(file_path):
-	with open(sys.argv[1]) as file:
+	with open(file_path) as file:
 		reader = csv.reader(file, delimiter=',')
 		reader = list(reader)
 		return reader
@@ -150,7 +151,7 @@ def decide_length_to_print(return_table):
 
 
 def print_return_table(return_table):
-	column_width = decide_length_to_print(return_table)
+	column_width = decide_length_to_print(return_table)	
 	for row in return_table:
 		i = 0
 		for index in row:
@@ -168,7 +169,13 @@ def main() -> None:
 			raise Exception("Usage: python3 describe.py [dataset]")
 		data_table = read_data(sys.argv[1])
 		return_table = create_return_table(data_table)
-		print_return_table(return_table)
+		# for row in return_table:
+		# 	print(row)
+		new = np.array(return_table)
+		new = return_table[1:3, 2:4]
+		for row in new:
+			print(row)
+		# print_return_table(return_table)
 
 	except Exception as e:
 		eprint(e)

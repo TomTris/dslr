@@ -8,5 +8,5 @@ RUN pip install pygame
 RUN pip install pandas
 RUN pip install scipy
 RUN pip install numpy
-
+RUN pip install matplotlib
 WORKDIR /app
