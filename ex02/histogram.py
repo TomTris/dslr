@@ -53,7 +53,7 @@ def display_all(courses, data_of_houses):
 
 	for i, course in enumerate(courses):
 		for cnt, data_of_a_house in enumerate(data_of_houses):
-			axs[i].hist(data_of_a_house[course], bins=21, alpha=0.55, color=colors[cnt])
+			axs[i].hist(data_of_a_house[course], bins=20, alpha=0.55, color=colors[cnt])
 		axs[i].set_title(course)
 		axs[i].set_xlabel('Normalized Scores')
 		axs[i].set_ylabel('Frequency')
@@ -67,17 +67,42 @@ def display_all(courses, data_of_houses):
 					Line2D([0], [1], color=colors[3], lw=16	)]
 	
 	fig.legend(custom_lines, ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'],\
-				fontsize='large', loc='lower right', ncol=2, bbox_to_anchor=(1, 0),\
-				handlelength=3.5, handleheight=2.5)
+				fontsize='large', loc='lower right', ncol=20, bbox_to_anchor=(1, 0),\
+				handlelength=4.5, handleheight=3.5)
 
 	plt.tight_layout()
 	plt.title('Overlapping Histograms of Hogwarts Courses')
 	plt.savefig('/app/ex02/histograms.png')
 
 
-def display_winner(courses, data_of_houses):
-	print(np.linspace(0, 1, 21).__class__)
-
+def display_winner(courses, data_of_houses):		
+	
+	interval_percentage = {}
+	
+	for course in courses:
+		interval_percentage[course] = [100] * 21
+		for data_of_house in data_of_houses:
+			interval = [0] * 21
+			student_total = 0
+			for cnt, each_score in enumerate(data_of_house[course]):
+				if not np.isnan(each_score):
+					interval[int(each_score * 20)] += 1
+					student_total += 1
+			for cnt in range(21):
+				if interval[cnt] / student_total * 100 < (interval_percentage[course])[cnt]:
+					(interval_percentage[course])[cnt] = interval[cnt] / student_total * 100
+	max_percentage = 0
+	winner = ''
+	for course in interval_percentage:
+		print(sum(interval_percentage[course]))
+		print(course)
+		print()
+		if sum(interval_percentage[course]) > max_percentage:
+			winner = course
+			max_percentage = sum(interval_percentage[course])
+	print("Winner:", winner)
+	print("Max_percentage:", max_percentage)
+	
 
 def main() -> None:
 	try:
@@ -85,7 +110,7 @@ def main() -> None:
 		courses = generate_courses()
 		normalize_score(data, courses)
 		data_of_houses = get_data_of_houses(data)
-		# display_all(courses, data_of_houses)
+		display_all(courses, data_of_houses)
 		display_winner(courses, data_of_houses)
 
 
