@@ -1,10 +1,9 @@
-from matplotlib.lines import Line2D
 import csv 
 import pandas as pd
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 
+column = 3
 
 def eprint(*args, **kwargs):
 	print('Error:', *args, file=sys.stderr, **kwargs)
@@ -14,18 +13,24 @@ def generate_courses():
 	with open(sys.argv[1]) as file:
 		reader = csv.reader(file, delimiter=',')
 		reader = list(reader)
-		for i, row in enumerate(reader):
-			if i > 0:
-				break
-			reader = np.array(row)
-			return reader[6:]
+		reader = np.array(reader[0])
+		return reader[6:]
 
 
 def normalize_score(data, courses):
+	print()
 	for course in courses:
 		old_max = data[course].max()
 		old_min = data[course].min()
 		data[course] = (data[course] - old_min) / (old_max - old_min)
+		for i in range(len(data[course])):
+			column2 = column - 1
+			value = data.at[i, course]
+			while not np.isnan(value):
+				if value >= column2 / column:
+					data.at[i, course] = column2 / column
+					break
+				column2 -= 1
 
 
 def get_data_of_houses(data):
@@ -41,7 +46,7 @@ def get_data_of_houses(data):
 	return data_of_houses
 
 
-def display_all(courses, data_of_houses):
+def display_all(courses, data_of_houses, winner):
 	plt.figure(figsize=(12, 8))
 
 	num_courses = len(courses)
@@ -52,11 +57,19 @@ def display_all(courses, data_of_houses):
 	colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
 
 	for i, course in enumerate(courses):
-		for cnt, data_of_a_house in enumerate(data_of_houses):
-			axs[i].hist(data_of_a_house[course], bins=20, alpha=0.55, color=colors[cnt])
-		axs[i].set_title(course)
-		axs[i].set_xlabel('Normalized Scores')
-		axs[i].set_ylabel('Frequency')
+		if i == 4:
+			for cnt in range(len(data_of_houses)):
+				# if cnt != 2 :
+					axs[i].hist((data_of_houses[cnt])[course], bins=column, alpha=0.7, color=colors[cnt])
+				# else:
+					print((data_of_houses[cnt])[course])
+			if (course == winner):
+				winner_title = 'WINNER: ' + course
+				axs[i].set_title(winner_title)
+			else:
+				axs[i].set_title(course)
+			axs[i].set_xlabel('Normalized Scores')
+			axs[i].set_ylabel('Frequency')
 
 	for j in range(len(courses), len(axs)):
 		fig.delaxes(axs[j])
@@ -67,42 +80,40 @@ def display_all(courses, data_of_houses):
 					Line2D([0], [1], color=colors[3], lw=16	)]
 	
 	fig.legend(custom_lines, ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'],\
-				fontsize='large', loc='lower right', ncol=20, bbox_to_anchor=(1, 0),\
+				fontsize='large', loc='lower right', ncol=1, bbox_to_anchor=(1, 0),\
 				handlelength=4.5, handleheight=3.5)
 
 	plt.tight_layout()
-	plt.title('Overlapping Histograms of Hogwarts Courses')
+	# fig.title('Overlapping Histograms of Hogwarts Courses')
 	plt.savefig('/app/ex02/histograms.png')
 
 
-def display_winner(courses, data_of_houses):		
+def find_winner(courses, data_of_houses):		
 	
 	interval_percentage = {}
-	
 	for course in courses:
-		interval_percentage[course] = [100] * 21
+		interval_percentage[course] = [100] * column
 		for data_of_house in data_of_houses:
-			interval = [0] * 21
+			interval = [0] * column
 			student_total = 0
-			for cnt, each_score in enumerate(data_of_house[course]):
+			for each_score in data_of_house[course]:
 				if not np.isnan(each_score):
-					interval[int(each_score * 20)] += 1
+					interval[int(each_score * column)] += 1
 					student_total += 1
-			for cnt in range(21):
+			for cnt in range(column):
 				if interval[cnt] / student_total * 100 < (interval_percentage[course])[cnt]:
 					(interval_percentage[course])[cnt] = interval[cnt] / student_total * 100
 	max_percentage = 0
 	winner = ''
 	for course in interval_percentage:
-		print(sum(interval_percentage[course]))
-		print(course)
-		print()
-		if sum(interval_percentage[course]) > max_percentage:
+		sum_interval_percentage = sum(interval_percentage[course])
+		if sum_interval_percentage > max_percentage:
 			winner = course
-			max_percentage = sum(interval_percentage[course])
+			max_percentage = sum_interval_percentage
 	print("Winner:", winner)
 	print("Max_percentage:", max_percentage)
-	
+	print()
+	return winner
 
 def main() -> None:
 	try:
@@ -110,9 +121,8 @@ def main() -> None:
 		courses = generate_courses()
 		normalize_score(data, courses)
 		data_of_houses = get_data_of_houses(data)
-		display_all(courses, data_of_houses)
-		display_winner(courses, data_of_houses)
-
+		winner = find_winner(courses, data_of_houses)
+		# display_all(courses, data_of_houses, winner)
 
 	except Exception as e:
 		eprint(e)
