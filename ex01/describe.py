@@ -1,9 +1,8 @@
-import numpy as np
 import csv
 import sys
 
 def read_data(file_path):
-	with open(file_path) as file:
+	with open(sys.argv[1]) as file:
 		reader = csv.reader(file, delimiter=',')
 		reader = list(reader)
 		return reader
@@ -14,7 +13,7 @@ def eprint(*args, **kwargs):
 
 
 
-def find_column_length_max(data_table:list):
+def find_column_length_max(data_table):
 	columns = []
 	counter = 0
 	for cnt in data_table[0]:
@@ -23,7 +22,7 @@ def find_column_length_max(data_table:list):
 		counter += 1
 
 
-def extract_column_value(data_table:list, column):
+def extract_column_value(data_table, column):
 	ret = []
 	for row in data_table[1:]:
 		if row[column] != '':
@@ -151,7 +150,7 @@ def decide_length_to_print(return_table):
 
 
 def print_return_table(return_table):
-	column_width = decide_length_to_print(return_table)	
+	column_width = decide_length_to_print(return_table)
 	for row in return_table:
 		i = 0
 		for index in row:
@@ -169,13 +168,7 @@ def main() -> None:
 			raise Exception("Usage: python3 describe.py [dataset]")
 		data_table = read_data(sys.argv[1])
 		return_table = create_return_table(data_table)
-		# for row in return_table:
-		# 	print(row)
-		new = np.array(return_table)
-		new = return_table[1:3, 2:4]
-		for row in new:
-			print(row)
-		# print_return_table(return_table)
+		print_return_table(return_table)
 
 	except Exception as e:
 		eprint(e)
