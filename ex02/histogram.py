@@ -81,7 +81,6 @@ def display_all(courses, data_of_houses, winner):
 				handlelength=4.5, handleheight=3.5)
 
 	plt.tight_layout()
-	# fig.title('Overlapping Histograms of Hogwarts Courses')
 	plt.show()
 
 
@@ -116,7 +115,6 @@ def main() -> None:
 		data = pd.read_csv(sys.argv[1])
 		courses = generate_courses()
 		normalize_score(data, courses)
-		print(data.describe())
 		data_of_houses = get_data_of_houses(data)
 		winner = find_winner(courses, data_of_houses)
 		display_all(courses, data_of_houses, winner)
