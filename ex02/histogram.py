@@ -1,9 +1,11 @@
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import csv 
 import pandas as pd
 import sys
 import numpy as np
 
-column = 3
+column = 20
 
 def eprint(*args, **kwargs):
 	print('Error:', *args, file=sys.stderr, **kwargs)
@@ -18,7 +20,6 @@ def generate_courses():
 
 
 def normalize_score(data, courses):
-	print()
 	for course in courses:
 		old_max = data[course].max()
 		old_min = data[course].min()
@@ -28,7 +29,7 @@ def normalize_score(data, courses):
 			value = data.at[i, course]
 			while not np.isnan(value):
 				if value >= column2 / column:
-					data.at[i, course] = column2 / column
+					data.at[i, course] = column2 / column + (0.1 / column)
 					break
 				column2 -= 1
 
@@ -48,7 +49,7 @@ def get_data_of_houses(data):
 
 def display_all(courses, data_of_houses, winner):
 	plt.figure(figsize=(12, 8))
-
+	
 	num_courses = len(courses)
 	ncols = int(num_courses ** 0.5) + 1
 	nrows = (num_courses - 1 ) // ncols + 1
@@ -57,19 +58,15 @@ def display_all(courses, data_of_houses, winner):
 	colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
 
 	for i, course in enumerate(courses):
-		if i == 4:
-			for cnt in range(len(data_of_houses)):
-				# if cnt != 2 :
-					axs[i].hist((data_of_houses[cnt])[course], bins=column, alpha=0.7, color=colors[cnt])
-				# else:
-					print((data_of_houses[cnt])[course])
-			if (course == winner):
-				winner_title = 'WINNER: ' + course
-				axs[i].set_title(winner_title)
-			else:
-				axs[i].set_title(course)
-			axs[i].set_xlabel('Normalized Scores')
-			axs[i].set_ylabel('Frequency')
+		for cnt in range(len(data_of_houses)):
+			axs[i].hist((data_of_houses[cnt])[course], bins=column, alpha=0.7, color=colors[cnt], range=(0.0, 1.0))
+		if (course == winner):
+			winner_title = 'WINNER: ' + course
+			axs[i].set_title(winner_title)
+		else:
+			axs[i].set_title(course)
+		axs[i].set_xlabel('Normalized Scores')
+		axs[i].set_ylabel('Frequency')
 
 	for j in range(len(courses), len(axs)):
 		fig.delaxes(axs[j])
@@ -85,11 +82,10 @@ def display_all(courses, data_of_houses, winner):
 
 	plt.tight_layout()
 	# fig.title('Overlapping Histograms of Hogwarts Courses')
-	plt.savefig('/app/ex02/histograms.png')
+	plt.show()
 
 
-def find_winner(courses, data_of_houses):		
-	
+def find_winner(courses, data_of_houses):	
 	interval_percentage = {}
 	for course in courses:
 		interval_percentage[course] = [100] * column
@@ -120,9 +116,10 @@ def main() -> None:
 		data = pd.read_csv(sys.argv[1])
 		courses = generate_courses()
 		normalize_score(data, courses)
+		print(data.describe())
 		data_of_houses = get_data_of_houses(data)
 		winner = find_winner(courses, data_of_houses)
-		# display_all(courses, data_of_houses, winner)
+		display_all(courses, data_of_houses, winner)
 
 	except Exception as e:
 		eprint(e)
