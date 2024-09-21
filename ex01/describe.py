@@ -98,7 +98,6 @@ def calculate_max(column_value):
 
 
 
-
 def add_to_table_to_print(return_table, column_value):
 	Count = len(column_value)
 	Mean = calculate_mean(column_value)
@@ -165,10 +164,11 @@ def print_return_table(return_table):
 def main() -> None:
 	try:
 		if len(sys.argv) != 2:
-			raise Exception("Usage: python3 describe.py [dataset]")
+			raise Exception("Usage: python3 describe.py [dataset]\nOr you can simply try:\npython3 describe.py dataset_train.csv")
 		data_table = read_data(sys.argv[1])
 		return_table = create_return_table(data_table)
 		print_return_table(return_table)
+		# print(df.describe())
 
 	except Exception as e:
 		eprint(e)
