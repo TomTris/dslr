@@ -112,7 +112,7 @@ def main():
 		plt.show()
 	except Exception as e:
 		print(e, file=sys.stderr)
-		print("Usage: python3 scatter_plot.py <dataset>\nExample:\n", file=sys.stderr)
+		print("Usage: python3 scatter_plot.py <dataset>\nExample:", file=sys.stderr)
 		print("python3 scatter_plot.py dataset_train.csv", file=sys.stderr)
 	
 

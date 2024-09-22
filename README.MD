@@ -19,6 +19,7 @@ Why: Because they are inversely proportional (run it, then you will see it)
 or 
 https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
 
+ex02.3  visualize data in pair_plot - means both histogram and scatter plot in 1 window to ahve overview
 
 
 How to run?

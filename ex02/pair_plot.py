@@ -1,3 +1,6 @@
+import sys
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import screeninfo
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -33,6 +36,12 @@ def creat_frame(num_courses, axs):
 		axs[i].set_title(shortened_course_name)
 
 
+def format_ticks(x, pos):
+    if x >= 1000 or x <= -1000:
+        return f'{int(x/1000)}k' 
+    return str(int(x))
+
+
 def display_inside_axs(num_courses, axs):
 	col = -1
 	row = 0
@@ -48,11 +57,17 @@ def display_inside_axs(num_courses, axs):
 			for cnt in range(len(data_of_houses)):
 				ax.hist((data_of_houses[cnt])[courses[col]], \
 					bins=20, alpha=0.7, color=colors[cnt], range=(min, max))
+			
 		else:
 			for cnt, data_of_house in enumerate(data_of_houses):
 				ax.scatter(x=data_of_house[courses[col]], y=data_of_house[courses[row]],\
 					alpha=0.5, color=[colors[cnt]], s=3)
+		ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_ticks))
+		ax.yaxis.set_major_formatter(ticker.FuncFormatter(format_ticks))
 
+def on_key(event):
+	if event.key == 'escape':
+		plt.close()
 
 def display_all():
 	num_courses = len(courses)
@@ -62,7 +77,7 @@ def display_all():
 
 	screen = screeninfo.get_monitors()[0]
 	fig, axs = plt.subplots(ncols=num_courses, nrows=num_courses, \
-						 figsize=(screen.width / 160, screen.height / 113))
+						 figsize=(screen.width / 130, screen.height / 113))
 	axs = axs.flatten()
 	creat_frame(num_courses, axs)
 	display_inside_axs(num_courses, axs)
@@ -72,18 +87,25 @@ def display_all():
 				fontsize='x-large', loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.005),\
 				handlelength=4.5, handleheight=3.5, borderpad=1.0)
 	plt.tight_layout(rect=[0, 0.05, 1, 1])
+	fig.canvas.mpl_connect('key_press_event', on_key)
 	plt.show()
 
 def main():
-	global data
-	global courses
-	global colors
-	data = pd.read_csv("dataset_train.csv")
-	get_data_of_houses(data)
-	colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
-	courses = data.columns[6:]
-	display_all()
-
+	try:
+		if len(sys.argv) != 2:
+			raise Exception("Error: Wrong amount of args")
+		global data
+		global courses
+		global colors
+		data = pd.read_csv(sys.argv[1])
+		get_data_of_houses(data)
+		colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
+		courses = data.columns[6:]
+		display_all()
+	except Exception as e:
+		print(e, file=sys.stderr)
+		print("Usage: python3 pair_plot.py <dataset>\nExample:", file=sys.stderr)
+		print("python3 pair_plot.py dataset_train.csv", file=sys.stderr)
 
 if __name__ == "__main__":
 	main()
