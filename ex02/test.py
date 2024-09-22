@@ -1,30 +1,19 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
-# Sample data
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
+ncols = 2
+nrows = 2
 
-# Create the plot
-fig, ax = plt.subplots()
-line, = ax.plot(x, y)
+# Create subplots and flatten the axes array
+fig, axs = plt.subplots(ncols=ncols, nrows=nrows, figsize=(15, 12))
+axs = axs.flatten()
 
-# Key event handler
-def on_key(event):
-    if event.key == 'up':
-        # Example action: increase line width
-        line.set_linewidth(line.get_linewidth() + 1)
-        plt.draw()  # Redraw the figure
-    elif event.key == 'down':
-        # Example action: decrease line width
-        line.set_linewidth(max(line.get_linewidth() - 1, 1))
-        plt.draw()
-    elif event.key == 'escape':
-        plt.close(fig)  # Close the plot window
+# Set individual titles for each subplot
+for i, ax in enumerate(axs):
+    ax.plot([1, 2, 3], [4, 5, 6])  # Plot example data
+    ax.set_title(f"Plot {i+1}")  # Set title for each subplot
 
-# Connect the key event
-fig.canvas.mpl_connect('key_press_event', on_key)
+# Set a super title for the entire figure (can also be done after subplot titles)
+fig.suptitle("Main Title for the Whole Figure", fontsize=16)
 
-# Show the plot
-plt.title('Press Up/Down to Change Line Width, Escape to Close')
+plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
