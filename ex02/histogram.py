@@ -54,7 +54,7 @@ def display_all(courses, data_of_houses, winner):
 	ncols = int(num_courses ** 0.5) + 1
 	nrows = (num_courses - 1 ) // ncols + 1
 	fig, axs = plt.subplots(nrows, ncols, figsize=(15, 12))
-	axs = axs.flatten()
+	axs = axs.flatten() #convert 2D to 1D Axes
 	colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
 
 	for i, course in enumerate(courses):
@@ -77,11 +77,11 @@ def display_all(courses, data_of_houses, winner):
 					Line2D([0], [1], color=colors[3], lw=16	)]
 	
 	fig.legend(custom_lines, ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'],\
-				fontsize='large', loc='lower right', ncol=1, bbox_to_anchor=(1, 0),\
-				handlelength=4.5, handleheight=3.5)
+				fontsize='x-large', loc='lower right', ncol=1, bbox_to_anchor=(1, 0),\
+				handlelength=4.5, handleheight=3.5, borderpad=1.0)
 
 	plt.tight_layout()
-	plt.show()
+	# plt.show()
 
 
 def find_winner(courses, data_of_houses):	
@@ -112,8 +112,13 @@ def find_winner(courses, data_of_houses):
 
 def main() -> None:
 	try:
+		if len(sys.argv) > 3:
+			raise Exception("Too many args")
+		if len(sys.argv) == 1:
+			raise Exception("Too little args")
 		data = pd.read_csv(sys.argv[1])
 		courses = generate_courses()
+		print(len(courses))
 		normalize_score(data, courses)
 		data_of_houses = get_data_of_houses(data)
 		winner = find_winner(courses, data_of_houses)
@@ -121,6 +126,9 @@ def main() -> None:
 
 	except Exception as e:
 		eprint(e)
+		print('Usage: python3 histogram.py <dataset>', file=sys.stderr)
+		print("For example:", file=sys.stderr)
+		print("python3 histogram.py dataset_train.csv", file=sys.stderr)
 
 
 if  __name__ == "__main__":
