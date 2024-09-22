@@ -1,13 +1,10 @@
-import matplotlib.patches as mpatches
 import os
-import time
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import pandas as pd
-import sys
 import numpy as np
-import seaborn as sbn
 from matplotlib.lines import Line2D
+import sys
 
 data_of_houses = 0
 images = []
@@ -15,8 +12,10 @@ current_course = 0
 ax = 0
 fig = 0
 courses = 0
+houses = 0
 
 def get_data_of_houses(data):
+	global houses
 	houses = []
 	for each_house in data.iloc[:, 1]:
 		if each_house not in houses:
@@ -51,16 +50,15 @@ def save_all(data_of_houses):
 	nrows = (num_courses - 1) // ncols + 1
 	colors = plt.cm.viridis(np.linspace(0, 1, len(data_of_houses)))
 	os.makedirs("images/", exist_ok=True)
-	custom_lines = [Line2D([0], [1], color=colors[0], lw=16	),
-					Line2D([0], [1], color=colors[1], lw=16	),
-					Line2D([0], [1], color=colors[2], lw=16	),
-					Line2D([0], [1], color=colors[3], lw=16	)]
+	custom_lines = []
+	for i in range(len(colors)):
+		custom_lines.append(Line2D([0], [1], color=colors[i], lw=16))
 	for i, course in enumerate(courses):
 		fig, axs = plt.subplots(ncols=ncols, nrows=nrows, figsize=(15,12))
 		axs = axs.flatten()
 		fig.suptitle(f"{course} with:", fontsize=25)
 		display_course(fig, axs, colors, course, courses)
-		fig.legend(custom_lines, ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'],\
+		fig.legend(custom_lines, houses,\
 				fontsize='x-large', loc='lower center', ncol=4, bbox_to_anchor=(0.5, -0.01),\
 				handlelength=4.5, handleheight=3.5, borderpad=1.0)
 		plt.tight_layout(rect=[0, 0.1, 1, 1])
@@ -69,7 +67,7 @@ def save_all(data_of_houses):
 		plt.close()
 
 
-def display_with_widget():
+def display_with_key():
 	global ax
 	global current_course
 
@@ -87,28 +85,35 @@ def on_key(event):
 
 	if event.key == 'left':
 		current_course -= 1
-		display_with_widget()
+		display_with_key()
 	elif event.key == 'right':
 		current_course += 1
-		display_with_widget()
+		display_with_key()
 	elif event.key == 'escape':
 		plt.close(fig)
 
 
 def main():
-	data = pd.read_csv("dataset_train.csv")
-	global courses
-	global data_of_houses
-	global ax
-	global fig
+	try:
+		if len(sys.argv) != 2:
+			raise Exception("Error: Wrong amount of args")
+		data = pd.read_csv("dataset_train.csv")
+		global courses
+		global data_of_houses
+		global ax
+		global fig
 
-	courses = data.columns[6:]
-	data_of_houses = get_data_of_houses(data)
-	save_all(data_of_houses)
-	fig, ax = plt.subplots(figsize=(15,12))
-	fig.canvas.mpl_connect('key_press_event', on_key)
-	display_with_widget()
-	plt.show()
+		courses = data.columns[6:]
+		data_of_houses = get_data_of_houses(data)
+		save_all(data_of_houses)
+		fig, ax = plt.subplots(figsize=(15,12))
+		fig.canvas.mpl_connect('key_press_event', on_key)
+		display_with_key()
+		plt.show()
+	except Exception as e:
+		print(e, file=sys.stderr)
+		print("Usage: python3 scatter_plot.py <dataset>\nExample:\n", file=sys.stderr)
+		print("python3 scatter_plot.py dataset_train.csv", file=sys.stderr)
 	
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import sys
 import numpy as np
 
 column = 20
+houses = 0
 
 def eprint(*args, **kwargs):
 	print('Error:', *args, file=sys.stderr, **kwargs)
@@ -35,6 +36,7 @@ def normalize_score(data, courses):
 
 
 def get_data_of_houses(data):
+	global houses
 	houses = []
 	mix_houses = data['Hogwarts House']
 	for house in mix_houses:
@@ -43,13 +45,11 @@ def get_data_of_houses(data):
 	
 	data_of_houses = []
 	for house in houses:
-		data_of_houses.append(data[data['Hogwarts House'] == house])
+		data_of_houses.append(data[data[data.columns[1]] == house])
 	return data_of_houses
 
 
 def display_all(courses, data_of_houses, winner):
-	plt.figure(figsize=(12, 8))
-	
 	num_courses = len(courses)
 	ncols = int(num_courses ** 0.5) + 1
 	nrows = (num_courses - 1 ) // ncols + 1
@@ -71,17 +71,16 @@ def display_all(courses, data_of_houses, winner):
 	for j in range(len(courses), len(axs)):
 		fig.delaxes(axs[j])
 	
-	custom_lines = [Line2D([0], [1], color=colors[0], lw=16	),
-					Line2D([0], [1], color=colors[1], lw=16	),
-					Line2D([0], [1], color=colors[2], lw=16	),
-					Line2D([0], [1], color=colors[3], lw=16	)]
+	custom_lines = []
+	for i in range(len(colors)):
+		custom_lines.append(Line2D([0], [1], color=colors[i], lw=16))
 	
-	fig.legend(custom_lines, ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff'],\
+	fig.legend(custom_lines, houses,\
 				fontsize='x-large', loc='lower right', ncol=1, bbox_to_anchor=(1, 0),\
 				handlelength=4.5, handleheight=3.5, borderpad=1.0)
 
 	plt.tight_layout()
-	# plt.show()
+	plt.show()
 
 
 def find_winner(courses, data_of_houses):	
@@ -118,7 +117,6 @@ def main() -> None:
 			raise Exception("Too little args")
 		data = pd.read_csv(sys.argv[1])
 		courses = generate_courses()
-		print(len(courses))
 		normalize_score(data, courses)
 		data_of_houses = get_data_of_houses(data)
 		winner = find_winner(courses, data_of_houses)
