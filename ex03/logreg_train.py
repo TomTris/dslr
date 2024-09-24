@@ -1,19 +1,19 @@
+import json
 import numpy as np
 import pandas as pd
 
-houses = []
 courses = []
 data = None
 learning_rate = 0.01
 
-def calculate_number_of_houses():
-	global houses
+def find_houses():
 	global data
 
+	houses = []
 	for each_house in data.iloc[:, 1]:
 		if each_house not in houses:
 			houses.append(each_house)
-	return len(houses)
+	return houses
 
 
 def find_avarage(column):
@@ -34,15 +34,17 @@ def normalize_score():
 	global data
 
 	value_data = data[:, 6:]
+	max_min = []
 	for i in range(len(value_data[0])):
 		old_max = value_data[:, i].max()
 		old_min = value_data[:, i].min()
+		max_min.append([old_max, old_min])
 		value_data[:, i] = (value_data[:, i] - old_min) / (old_max - old_min)
 		avarage = find_avarage(value_data[:, i])
 		for j in range(len(value_data[:, i])):
 			if np.isnan(value_data[j][i]):
 				value_data[j][i] = avarage
-
+	return max_min
 
 def sigmoid(z):
 	return (1 / (1 + np.exp(-z)))
@@ -108,34 +110,33 @@ def calculate_weight(house_find, lenth):
 		else:
 			datal[i][1] = 0
 	total = datal.shape[0]
-	y_val = datal[:, 1]
-	x_val = np.ones([len(datal), len(weight)])
-	x_val[:, 1:] = datal[:, 6:]
+	# y_val = datal[:, 1]
+	# x_val = np.ones([len(datal), len(weight)])
+	# x_val[:, 1:] = datal[:, 6:]
 	return calculate_weight2(weight, datal, total)
 
 
 def main():
 	global data
-	global houses
 	global courses
 
 	data = pd.read_csv("dataset_train.csv")
 	courses = data.columns[6:]
-	number_of_houses = calculate_number_of_houses()
+	houses = find_houses()
 	data = np.array(data)
-	normalize_score()
-	weights = np.zeros([number_of_houses, len(courses) + 1])
+	max_min = normalize_score()
+	weights = np.zeros([len(houses), len(courses) + 1])
 	for i in range(len(weights)):
 		weights[i] = calculate_weight(houses[i], len(courses) + 1)
+	to_print = {
+		'value': weights.tolist(),
+		'max_min': max_min,
+		'houses': houses
+	}
+	print(to_print)
 	with open("weights", 'w') as file:
-		for i, weight in enumerate(weights):
-			print(houses[i], file=file, end=';')
-			for cnt in range(len(weight)):
-				if cnt != len(weight) - 1:
-					print(weight[cnt], end=',', file=file) 
-				else:
-					print(weight[cnt], end='', file=file) 
-			print(file=file)
+		json.dump(to_print, file, indent=4)
+		
 
 
 if __name__ == "__main__":
