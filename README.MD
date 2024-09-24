@@ -24,6 +24,9 @@ ex02.3  visualize data in pair_plot - means both histogram and scatter plot in 1
 
 ex03(on going): first maschine learning exercise: Train a model with dataset_train.csv and let it predict file dataset_test.csv
 
+ex03 (on going):
+- Train a model with a databank (such as dataset_train.csv)
+- use that model to predict another databank (such as dataset_test.csv) to check the ability to guess a the house.
 
 How to run?
 
