@@ -33,7 +33,6 @@ def sigmoid(weight, xs):
 def highest(results):
 	cnt = 0
 	current = results[0]
-	print(results)
 	for i, result in enumerate(results):
 		if result > current:
 			i = cnt

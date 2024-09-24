@@ -1,63 +1,51 @@
 import numpy as np
 import pandas as pd
 
-data_of_houses = []
 houses = []
 courses = []
 data = None
-learning_rate = 0.1
+learning_rate = 0.01
 
-def get_data_of_houses():
+def calculate_number_of_houses():
 	global houses
 	global data
-	global data_of_houses
 
 	for each_house in data.iloc[:, 1]:
 		if each_house not in houses:
 			houses.append(each_house)
-			data_of_houses.append(data[data[data.columns[1]] == each_house])
+	return len(houses)
 
 
-def create_weight_array():
-	global data_of_houses
-	global houses
-
-	weight = list(courses)
-	weight.append(0)
-	weights = []
-	for i in range(len(houses)):
-		weights.append(weight)
-		for j in range(len(weights[i])):
-			weights[i][j] = 0
-	return weights
+def find_avarage(column):
+	summe = 0
+	total = 0
+	for each_value in column:
+		if not np.isnan(each_value):
+			summe += each_value
+			total += 1
+	avarage = total / summe
+	for i in range(len(column)):
+		if np.isnan(each_value):
+			column[i] = avarage
+	return avarage
 
 
 def normalize_score():
 	global data
 
-	for course in courses:
-		old_max = data[course].max()
-		old_min = data[course].min()
-		data[course] = (data[course] - old_min) / (old_max - old_min)
-	
+	value_data = data[:, 6:]
+	for i in range(len(value_data[0])):
+		old_max = value_data[:, i].max()
+		old_min = value_data[:, i].min()
+		value_data[:, i] = (value_data[:, i] - old_min) / (old_max - old_min)
+		avarage = find_avarage(value_data[:, i])
+		for j in range(len(value_data[:, i])):
+			if np.isnan(value_data[j][i]):
+				value_data[j][i] = avarage
 
 
 def sigmoid(z):
-	return (1 / (1 + np.exp(z)))
-
-
-def check_nan(xs):
-	i = 0
-	while 1:
-		if i < len(xs):
-			if np.isnan(xs[i]):
-				return "yes"
-			else:
-				i += 1
-		else:
-			break 
-	return "no"
-
+	return (1 / (1 + np.exp(-z)))
 
 
 def calculate_z(weight, xs):
@@ -70,71 +58,81 @@ def calculate_z(weight, xs):
 # loc -> to change on copy
 # data[data[data.columns[1]] == house][data.columns[1]] = 0
 # => create a new one and change in the new one => be careful
-def calculate_weight2(house, weight, datal, num_of_rows, iterations=0, abc=[]):
+def calculate_weight2(weight, datal, total, iterations=0):
 	global learning_rate
-	abc = []
-	summes = weight
-	for i in range(len(summes)):
-		summes[i] = 0
+	
+	summes = np.zeros_like(weight)
+	for i in range(total):
+		row = datal[i]
+		actual = row[1]
+		xs = row[6:]
+		z = calculate_z(weight, xs)
+		predicted = sigmoid(z)
+		summes[0] += (predicted - actual)
+		for j in range(len(xs)):
+			summes[j + 1] += (predicted - actual) * xs[j]
 
-	m = 0
-	for i in range(num_of_rows):
-		row = datal.loc[i:i]
-		row = np.array(row)
-		if (check_nan(row[0, 6:]) == "no"):
-			m += 1
-			actual = row[0][1]
-			abc.append(actual)
-			xs = row[0, 6:]
-			z = calculate_z(weight, xs)
-			predicted = sigmoid(z)
-			summes[0] += (predicted - actual)
-			for i in range(len(summes) - 1):
-				summes[i + 1] += (predicted - actual) * xs[i]
-
-				
 	for i in range(len(summes)):
-		summes[i] /= m
-	for i in range(len(summes)):
+		summes[i] /= total
 		weight[i] = weight[i] - learning_rate * summes[i]
+
 	if iterations == 10:
 		return weight
-	return calculate_weight2(house, weight, datal, num_of_rows, iterations + 1, abc)
+	return calculate_weight2(weight, datal, total, iterations + 1)
 
+# def calculate_weight2(weight, datal, y_val, x_val, total, iterations=0):
+# 	global learning_rate
+
+# 	sigmoids = sigmoid(np.dot(weight, x_val.T))
+# 	summes = np.dot(sigmoids - y_val, x_val)
+# 	print(summes)
+# 	gradients = summes / x_val.shape[1] * learning_rate
+# 	for i in range(14):
+# 		weight[i] = weight[i] - gradients[i]
+
+
+# 	if iterations == 10:
+# 		return weight
+# 	return calculate_weight2(weight, datal,y_val, x_val, total, iterations + 1)
 
 
 # dono why must have weight copy, if not all of them will be change, somehow?
-def calculate_weight(house, weight):
+def calculate_weight(house_find, lenth):
 	global data
 	datal = data.copy()
-
-	datal.loc[datal[datal.columns[1]] != house, datal.columns[1]] = 0
-	datal.loc[datal[datal.columns[1]] == house, datal.columns[1]] = 1
-	num_of_rows = datal.shape[0]
-
-	weight_copy = weight.copy()
-	return calculate_weight2(house, weight_copy, datal, num_of_rows)
+	weight = np.zeros([lenth])
+	
+	for i in range(len(datal)):
+		if datal[i][1] == house_find:
+			datal[i][1] = 1
+		else:
+			datal[i][1] = 0
+	total = datal.shape[0]
+	y_val = datal[:, 1]
+	x_val = np.ones([len(datal), len(weight)])
+	x_val[:, 1:] = datal[:, 6:]
+	return calculate_weight2(weight, datal, total)
 
 
 def main():
 	global data
-	global data_of_houses
 	global houses
 	global courses
 
 	data = pd.read_csv("dataset_train.csv")
 	courses = data.columns[6:]
+	number_of_houses = calculate_number_of_houses()
+	data = np.array(data)
 	normalize_score()
-	data_of_houses = get_data_of_houses()
-	weights = create_weight_array()
+	weights = np.zeros([number_of_houses, len(courses) + 1])
 	for i in range(len(weights)):
-		weights[i] = calculate_weight(houses[i], weights[i])
+		weights[i] = calculate_weight(houses[i], len(courses) + 1)
 	with open("weights", 'w') as file:
 		for i, weight in enumerate(weights):
 			print(houses[i], file=file, end=';')
 			for cnt in range(len(weight)):
 				if cnt != len(weight) - 1:
-					print(weight[cnt], end=';', file=file) 
+					print(weight[cnt], end=',', file=file) 
 				else:
 					print(weight[cnt], end='', file=file) 
 			print(file=file)
