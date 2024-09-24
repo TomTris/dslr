@@ -66,16 +66,12 @@ def calculate_z(weight, xs):
 		ret += x * weight[cnt + 1]
 	return ret
 	
-actuals = []
-cnt = 0
 # loc[1:4, 5:6], iloc ['Hogwards']
 # loc -> to change on copy
 # data[data[data.columns[1]] == house][data.columns[1]] = 0
 # => create a new one and change in the new one => be careful
 def calculate_weight2(house, weight, datal, num_of_rows, iterations=0, abc=[]):
 	global learning_rate
-	global cnt
-	global actuals
 	abc = []
 	summes = weight
 	for i in range(len(summes)):
@@ -101,9 +97,7 @@ def calculate_weight2(house, weight, datal, num_of_rows, iterations=0, abc=[]):
 		summes[i] /= m
 	for i in range(len(summes)):
 		weight[i] = weight[i] - learning_rate * summes[i]
-	if iterations == 1:
-		cnt += 1
-		actuals.append(abc)
+	if iterations == 10:
 		return weight
 	return calculate_weight2(house, weight, datal, num_of_rows, iterations + 1, abc)
 
@@ -135,13 +129,15 @@ def main():
 	weights = create_weight_array()
 	for i in range(len(weights)):
 		weights[i] = calculate_weight(houses[i], weights[i])
-	for i in range(len(weights)):
-		print()
-		print()
-		print()
-		print()
-		print()
-		print(weights[i])
+	with open("weights", 'w') as file:
+		for i, weight in enumerate(weights):
+			print(houses[i], file=file, end=';')
+			for cnt in range(len(weight)):
+				if cnt != len(weight) - 1:
+					print(weight[cnt], end=';', file=file) 
+				else:
+					print(weight[cnt], end='', file=file) 
+			print(file=file)
 
 
 if __name__ == "__main__":
