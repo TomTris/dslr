@@ -5,9 +5,10 @@ This project is about
 1. visualising data in table (ex00), graphic (ex01) form
 2. first maschine learning (ex02)
 
-ex01: visualize data in a table with certain features: count, mean, std, min, 25%, 50%, 75%, max.
+ex01 (done):
+visualize data in a table with certain features: count, mean, std, min, 25%, 50%, 75%, max.
 
-ex02:
+ex02 (done):
 
 ex02.1 => visualize data in histograms to see which course has most homogenous score distribution.
 Because there are 2 pretty similar courses:Care of Magical Creatures and Arithmancy, so i need to have a further step to find the winner.
@@ -20,6 +21,8 @@ or
 https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
 
 ex02.3  visualize data in pair_plot - means both histogram and scatter plot in 1 window to ahve overview
+
+ex03(on going): first maschine learning exercise: Train a model with dataset_train.csv and let it predict file dataset_test.csv
 
 
 How to run?
