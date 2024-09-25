@@ -1,3 +1,4 @@
+import sys
 import json
 import numpy as np
 import pandas as pd
@@ -34,26 +35,31 @@ def highest(results):
 
 
 def main():
-	data = pd.read_csv("dataset_test.csv")
-	index_name = data.columns[0]
-	house_name = data.columns[1]
-	data = np.array(data)
-	with open('weights', 'r') as file:
-		parsing = json.load(file)
-	weights = parsing['values']
-	max_min = parsing['max_min']
-	houses = parsing['houses']
-	normalize_score(data, max_min)
-	with open("houses.csv", 'w') as file:
-		print(index_name, house_name, sep=',', file=file)
-		for i, each_row in enumerate(data):
-			print(i, end=',', file=file)
-			results = []
-			for j, weight in enumerate(weights):
-				results.append(sigmoid(weight, each_row[6:]))
-			print(houses[highest(results)], file=file)
+	try:
+		if len(sys.argv) != 3:
+			raise Exception("Usage: python3 logreg_predict.py <dataset> <json>\nFor example:\npython3 logreg_predict.py dataset_test.csv weights.json ")
+		data = pd.read_csv(sys.argv[1])
+		index_name = data.columns[0]
+		house_name = data.columns[1]
+		data = np.array(data)
+		with open(sys.argv[2], 'r') as file:
+			parsing = json.load(file)
+		weights = parsing['values']
+		max_min = parsing['max_min']
+		houses = parsing['houses']
+		normalize_score(data, max_min)
+		with open("houses.csv", 'w') as file:
+			print(index_name, house_name, sep=',', file=file)
+			for i, each_row in enumerate(data):
+				print(i, end=',', file=file)
+				results = []
+				for j, weight in enumerate(weights):
+					results.append(sigmoid(weight, each_row[6:]))
+				print(houses[highest(results)], file=file)
+	except Exception as e:
+		print(e, file=sys.stderr)
 
-	
+		
 
 
 if __name__ == '__main__':

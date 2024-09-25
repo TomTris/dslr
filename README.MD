@@ -1,4 +1,5 @@
 original subject = file en.subject.pdf
+(Project is done)
 
 This project is about
 
@@ -22,9 +23,9 @@ https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
 
 ex02.3  visualize data in pair_plot - means both histogram and scatter plot in 1 window to ahve overview
 
-ex03(on going): first maschine learning exercise: Train a model with dataset_train.csv and let it predict file dataset_test.csv
+ex03: first maschine learning exercise: Train a model with dataset_train.csv and let it predict file dataset_test.csv
 
-ex03 (on going):
+ex03:
 - Train a model with a databank (such as dataset_train.csv)
 - use that model to predict another databank (such as dataset_test.csv) to check the ability to guess a the house.
 
