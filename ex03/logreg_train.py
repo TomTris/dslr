@@ -78,24 +78,9 @@ def calculate_weight2(weight, datal, total, iterations=0):
 		summes[i] /= total
 		weight[i] = weight[i] - learning_rate * summes[i]
 
-	if iterations == 10:
+	if iterations == 800:
 		return weight
 	return calculate_weight2(weight, datal, total, iterations + 1)
-
-# def calculate_weight2(weight, datal, y_val, x_val, total, iterations=0):
-# 	global learning_rate
-
-# 	sigmoids = sigmoid(np.dot(weight, x_val.T))
-# 	summes = np.dot(sigmoids - y_val, x_val)
-# 	print(summes)
-# 	gradients = summes / x_val.shape[1] * learning_rate
-# 	for i in range(14):
-# 		weight[i] = weight[i] - gradients[i]
-
-
-# 	if iterations == 10:
-# 		return weight
-# 	return calculate_weight2(weight, datal,y_val, x_val, total, iterations + 1)
 
 
 # dono why must have weight copy, if not all of them will be change, somehow?
@@ -110,9 +95,6 @@ def calculate_weight(house_find, lenth):
 		else:
 			datal[i][1] = 0
 	total = datal.shape[0]
-	# y_val = datal[:, 1]
-	# x_val = np.ones([len(datal), len(weight)])
-	# x_val[:, 1:] = datal[:, 6:]
 	return calculate_weight2(weight, datal, total)
 
 
@@ -129,7 +111,7 @@ def main():
 	for i in range(len(weights)):
 		weights[i] = calculate_weight(houses[i], len(courses) + 1)
 	to_print = {
-		'value': weights.tolist(),
+		'values': weights.tolist(),
 		'max_min': max_min,
 		'houses': houses
 	}
