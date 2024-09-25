@@ -6,10 +6,10 @@ This project is about
 1. visualising data in table (ex00), graphic (ex01) form
 2. first maschine learning (ex02)
 
-ex01 (done):
+ex01:
 visualize data in a table with certain features: count, mean, std, min, 25%, 50%, 75%, max.
 
-ex02 (done):
+ex02:
 
 ex02.1 => visualize data in histograms to see which course has most homogenous score distribution.
 Because there are 2 pretty similar courses:Care of Magical Creatures and Arithmancy, so i need to have a further step to find the winner.
@@ -25,7 +25,7 @@ ex02.3  visualize data in pair_plot - means both histogram and scatter plot in 1
 
 ex03: first maschine learning exercise: Train a model with dataset_train.csv and let it predict file dataset_test.csv
 
-ex03:
+ex03 :
 - Train a model with a databank (such as dataset_train.csv)
 - use that model to predict another databank (such as dataset_test.csv) to check the ability to guess a the house.
 
